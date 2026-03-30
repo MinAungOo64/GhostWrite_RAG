@@ -73,3 +73,9 @@ const response = await fetch('http://localhost:11434/api/generate', {
                     })
                 });
 ```
+
+## 🏗️ Technical Stack
+* **LLM Engine**: Ollama
+* **Embeddings**: Transformers.js (all-MiniLM-L6-v2)
+* **Parsing**: Mammoth.js (for .docx support)
+* **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
