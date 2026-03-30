@@ -1,7 +1,7 @@
-✍️ GhostWrite_RAG
+# ✍️ GhostWrite_RAG
 GhostWrite_RAG is a privacy-first, local-only "Smart Writing Assistant." It uses a Dual-Agent architecture to help researchers and writers complete sentences based on their own local documents (PDFs, DOCX, etc.) without ever sending data to the cloud.
 
-🚀 Key Features
+# 🚀 Key Features
 Dual AI Agent System:
 
 The Researcher: A RAG-based chat agent that retrieves specific context from your local files.
@@ -14,9 +14,8 @@ Persistent Context Caching: Manually "pin" research findings from the chat into 
 
 Zero Installation: A single index.html file is all you need.
 
-🛠️ Prerequisites
+# 🛠️ Prerequisites
 Ollama: Install Ollama to run the LLM locally.
-
 Model: Pull the default model (or your preferred version):
 
 Bash
