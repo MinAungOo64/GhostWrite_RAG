@@ -74,6 +74,8 @@ const response = await fetch('http://localhost:11434/api/generate', {
                 });
 ```
 
+---
+
 ## 🏗️ Technical Stack
 * **LLM Engine**: Ollama
 * **Embeddings**: Transformers.js (all-MiniLM-L6-v2)
