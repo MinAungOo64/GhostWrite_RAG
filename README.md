@@ -44,17 +44,20 @@ The system is optimized for **Qwen-2.5-Coder (3B)**. To use a different model (e
 // Locate this block in index.html to switch models
 // RAG
 const response = await fetch('http://localhost:11434/api/generate', {
-    method: 'POST',
-    body: JSON.stringify({
-        model: 'qwen2.5-coder:3b', // <--- Change model name here
-        prompt: prompt,
-        options: {
-            temperature: 0.2,
-            num_predict: 32, // Keeps autocomplete snappy
-            stop: ["\n\n"]
-        }
-    })
-});
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'qwen2.5-coder:3b',
+                    prompt,
+                    stream: false,
+                    options: {
+                        temperature: 0.2,
+                        num_predict: 256
+                    }
+                })
+            });
 // AutoCompleter
 const response = await fetch('http://localhost:11434/api/generate', {
                     method: 'POST',
