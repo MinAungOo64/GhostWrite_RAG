@@ -2,6 +2,8 @@
 
 **GhostWrite_RAG** is a privacy-centric, local-first "Smart Writing Assistant." It employs a **Dual-Agent** architecture to provide real-time sentence completions grounded in your personal research documents (PDFs, DOCX, etc.) without ever sending data to the cloud.
 
+<img width="1899" height="867" alt="image" src="https://github.com/user-attachments/assets/3af9f0a0-35a8-4e94-968f-dbb47f8531c7" />
+
 ## 🚀 Key Features
 
 * **Dual AI Agent System**: 
