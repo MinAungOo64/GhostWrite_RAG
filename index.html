@@ -1,34 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <title>Inline Autocomplete</title>
     <style>
-        body { font-family: sans-serif; padding: 40px; }
-        #sidebar {
-            position: fixed; right: 20px; top: 20px; width: 450px;
-            background: #fff; border-left: 4px solid #2563eb;
-            padding: 15px; font-size: 14px; box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
+        :root {
+            --bg: #f4f7f2;
+            --ink: #102016;
+            --muted: #496153;
+            --card: rgba(255, 255, 255, 0.82);
+            --border: #c7d6c9;
+            --primary: #0f766e;
+            --primary-strong: #0b5f58;
+            --accent: #e68a00;
+            --danger: #be123c;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --shadow: 0 18px 34px rgba(16, 32, 22, 0.12);
         }
-        #editor { 
-            width: 900px; font-size: 18px; 
-            line-height: 1.6; padding: 20px;
-            white-space: pre-wrap; /* Ensures line breaks and spaces are respected */
-            border: 1px solid #ccc;
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Manrope', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 14%, #ddeed9 0%, rgba(221, 238, 217, 0) 45%),
+                radial-gradient(circle at 90% 0%, #f7debc 0%, rgba(247, 222, 188, 0) 40%),
+                linear-gradient(180deg, #f9fbf7 0%, var(--bg) 100%);
+            min-height: 100vh;
+            padding: 28px;
+            overflow-x: hidden;
+        }
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.3;
+        }
+        body::before {
+            left: -110px;
+            bottom: -120px;
+            background: #9ad4a6;
+        }
+        body::after {
+            right: -90px;
+            top: 34%;
+            background: #f2b04d;
+        }
+        .app-shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 420px;
+            gap: 24px;
+            align-items: start;
+        }
+        .workspace {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            backdrop-filter: blur(6px);
+            animation: rise-in 0.45s ease;
+        }
+        h1 {
+            margin: 0 0 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.8rem, 2.8vw, 2.5rem);
+            letter-spacing: -0.02em;
+        }
+        .subtitle {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 0.98rem;
+        }
+        #editor {
+            width: 100%;
+            font-size: 1.06rem;
+            line-height: 1.7;
+            padding: 20px;
+            white-space: pre-wrap;
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             min-height: 500px;
             overflow-y: auto;
             resize: vertical;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #editor:focus {
+            outline: none;
+            border-color: #7fb09a;
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.13);
+        }
+        #editor:empty::before {
+            content: attr(placeholder);
+            color: #7a8e80;
         }
         #ghost-span {
-            color: gray;
+            color: #7b8f82;
             font-style: italic;
-            display: inline; /* Ghost text is inline with content */
+            display: inline;
+        }
+        #sidebar {
+            position: sticky;
+            top: 22px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            font-size: 14px;
+            box-shadow: var(--shadow);
+            max-height: calc(100vh - 44px);
+            overflow-y: auto;
+            backdrop-filter: blur(6px);
+            animation: rise-in 0.55s ease;
+        }
+        .panel-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+        .muted-text {
+            font-size: 12px;
+            color: #526658;
+            margin: 8px 0;
+        }
+        .divider {
+            margin: 16px 0;
+            border: 0;
+            border-top: 1px solid var(--border);
+        }
+        .btn {
+            width: 100%;
+            padding: 10px 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            transition: transform 0.12s ease, filter 0.2s ease, opacity 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.04);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-neutral {
+            background: #e8efe7;
+            color: #1d3124;
+            border: 1px solid #cad7ca;
+        }
+        .btn-primary {
+            background: linear-gradient(120deg, var(--primary) 0%, var(--primary-strong) 100%);
+            color: #fff;
+        }
+        .btn-accent {
+            background: linear-gradient(120deg, #f39c12 0%, var(--accent) 100%);
+            color: #fff;
+        }
+        .btn-danger {
+            background: linear-gradient(120deg, #e11d48 0%, var(--danger) 100%);
+            color: #fff;
         }
         #progress-container {
             width: 100%;
             height: 6px;
-            background: #e5e7eb;
+            background: #d9e4da;
             border-radius: 3px;
             overflow: hidden;
             margin: 10px 0;
@@ -36,7 +197,7 @@
         }
         #progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            background: linear-gradient(90deg, #0f766e, #f39c12);
             width: 0%;
             transition: width 0.3s ease;
             border-radius: 3px;
@@ -45,8 +206,8 @@
             display: inline-block;
             width: 12px;
             height: 12px;
-            border: 2px solid #e5e7eb;
-            border-top-color: #2563eb;
+            border: 2px solid #d9e4da;
+            border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
             margin-right: 6px;
@@ -59,54 +220,104 @@
             max-height: 460px;
             overflow-y: auto;
             word-break: break-word;
-            border: 1px solid #e5e7eb;
-            padding: 8px;
-            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            background: rgba(253, 255, 253, 0.9);
             margin-top: 8px;
         }
         .chat-message {
             margin-bottom: 10px;
+            line-height: 1.45;
         }
         .chat-role {
             font-weight: 600;
-            color: #1d4ed8;
+            color: var(--primary-strong);
         }
         #rag-question-input {
             width: 100%;
             box-sizing: border-box;
             margin-top: 8px;
-            padding: 6px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fbfefb;
+            font-size: 0.95rem;
+        }
+        #rag-question-input:focus {
+            outline: none;
+            border-color: #7fb09a;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
         }
         #chat-log details summary {
-            color: #2563eb;
+            color: var(--primary-strong);
             text-decoration: underline;
         }
         #chat-log details summary:hover {
             cursor: pointer;
-            color: #1d4ed8;
+            color: var(--primary);
+        }
+        @keyframes rise-in {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media (max-width: 1180px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+            #sidebar {
+                position: static;
+                max-height: none;
+            }
+        }
+        @media (max-width: 720px) {
+            body {
+                padding: 14px;
+            }
+            .workspace,
+            #sidebar {
+                padding: 14px;
+            }
+            #editor {
+                min-height: 360px;
+                font-size: 1rem;
+                padding: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Inline Autocomplete Example</h1>
-    <div id="editor" contenteditable="true" placeholder="Type something..."></div>
-    <div id="sidebar">
-        <strong>RAG Index Building</strong>
-        <button id="select-folder-btn" style="width: 100%; padding: 8px; margin: 10px 0; cursor: pointer;">📁 Select Docs Folder</button>
-        <p id="folder-status" style="font-size: 12px; color: #666;">No folder selected</p>
-        <button id="build-index-btn" style="width: 100%; padding: 8px; margin: 10px 0; cursor: pointer; background: #2563eb; color: white; border: none; border-radius: 4px;" disabled>Build Index</button>
-        <div id="progress-container">
-            <div id="progress-bar"></div>
-        </div>
-        <p id="index-status" style="font-size: 12px; color: #666; margin-top: 10px;"></p>
-        <hr style="margin: 15px 0;">
-        <strong>RAG Chat</strong>
-        <div id="chat-log">
-            <div class="chat-message"><span class="chat-role">System:</span> Ask a question to retrieve top 2 chunks.</div>
-        </div>
-        <input id="rag-question-input" type="text" placeholder="Ask a question for retrieval...">
-        <button id="ask-rag-btn" style="width: 100%; padding: 8px; margin: 8px 0; cursor: pointer; background: #0f766e; color: white; border: none; border-radius: 4px;">Ask</button>
-        <button id="clear-context-btn" style="width: 100%; padding: 8px; cursor: pointer; background: #ef4444; color: white; border: none; border-radius: 4px;">Clear Context</button>
+    <div class="app-shell">
+        <section class="workspace">
+            <h1>GhostWrite RAG Studio</h1>
+            <p class="subtitle">Type in the editor for inline autocomplete, and use RAG chat to ground suggestions in your docs.</p>
+            <div id="editor" contenteditable="true" placeholder="Type something..."></div>
+        </section>
+
+        <aside id="sidebar">
+            <strong class="panel-title">RAG Index Building</strong>
+            <button id="select-folder-btn" class="btn btn-neutral">Select Docs Folder</button>
+            <p id="folder-status" class="muted-text">No folder selected</p>
+            <button id="build-index-btn" class="btn btn-primary" disabled>Build Index</button>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <p id="index-status" class="muted-text"></p>
+            <hr class="divider">
+            <strong class="panel-title">RAG Chat</strong>
+            <div id="chat-log">
+                <div class="chat-message"><span class="chat-role">System:</span> Ask a question to retrieve top 2 chunks.</div>
+            </div>
+            <input id="rag-question-input" type="text" placeholder="Ask a question for retrieval...">
+            <button id="ask-rag-btn" class="btn btn-accent">Ask</button>
+            <button id="clear-context-btn" class="btn btn-danger">Clear Context</button>
+        </aside>
     </div>
 
 
@@ -643,8 +854,19 @@
             return suggestion;
         }
 
+        function isEditorEffectivelyEmpty() {
+            const text = (editor.innerText || '').replace(/\u200B/g, '').trim();
+            return text.length === 0;
+        }
+
         function scheduleGhostSuggestion() {
             clearTimeout(timer);
+
+            if (isEditorEffectivelyEmpty()) {
+                removeGhostSpan();
+                return;
+            }
+
             const currentRequestVersion = ++requestVersion;
 
             timer = setTimeout(async () => {
@@ -663,6 +885,9 @@
                 }
 
                 const fullText = editor.innerText;
+                if (!fullText || fullText.trim().length === 0) {
+                    return;
+                }
                 const cursorPos = getCaretCharacterOffsetWithin(editor);
                 const textBefore = fullText.substring(0, cursorPos);
                 const textAfter = fullText.substring(cursorPos);
@@ -751,6 +976,11 @@
             // Remove ghost text immediately when the user types.
             removeGhostSpan();
             autoResizeEditor();
+
+            if (isEditorEffectivelyEmpty()) {
+                return;
+            }
+
             scheduleGhostSuggestion();
         });
 
